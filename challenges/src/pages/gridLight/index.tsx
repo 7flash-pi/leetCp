@@ -1,6 +1,6 @@
-"use client";
 import { useState } from "react";
-import Cell from "./common/components/Cell";
+import Cell from "./Cell";
+
 
 export default function Home() {
   const [order, setOrder] = useState([] as number[]);
