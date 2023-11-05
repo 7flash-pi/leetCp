@@ -13,6 +13,9 @@ export default function Home() {
         <li onClick={() => {
           router.push('gridLight')
         }}>GridLightChallenge</li>
+         <li onClick={() => {
+          router.push('trafficLight')
+        }}>TrafficLightChallenge</li>
       </ul>
 
     </main>
