@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTMX To-Do List</title>
+</head>
+<script src="https://unpkg.com/htmx.org@1.7.0/dist/htmx.js"></script>
+<script>
+    document.getElementById('addTask').addEventListener('htmx:afterRequest', function (event) {
+        if (event.detail.xhr.status === 200) {
+            // Parse the JSON response
+            const response = JSON.parse(event.detail.xhr.response);
+
+            // Extract the new task
+            const newTask = response.task;
+
+            // Create a new list item for the task
+            const listItem = document.createElement('li');
+            listItem.textContent = newTask;
+
+            // Append the new task to the task list
+            document.getElementById('taskList').appendChild(listItem);
+        }
+    });
+</script>
+
+<body>
+    <h1>HTMX To-Do List</h1>
+    <input type="text" id="task" placeholder="Add a new task">
+    <button id="addTask" hx-post="/addTask" hx-swap="outerHTML">Add Task</button>
+    <ul id="taskList">
+        <!-- To-do tasks will be added here dynamically -->
+    </ul>
+    
+       
+    </ul>
+</body>
+</html>
