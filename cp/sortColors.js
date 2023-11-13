@@ -4,7 +4,6 @@
 
 // You must solve this problem without using the library's sort function.
 
-
 // The Dutch National Flag algorithm follows these steps:
 
 // Initialize three pointers: low, mid, and high.
@@ -18,24 +17,20 @@
 // If the element at the mid position is equal to the smallest value (e.g., 0 in your case), swap the element at the mid position with the element at the low position and move both mid and low pointers to the next positions.
 // If the element at the mid position is equal to the largest value (e.g., 2 in your case), swap the element at the mid position with the element at the high position and move the high pointer to the previous position.
 
+var sortColors = function (nums) {
+  let low = 0;
+  let mid = 0;
+  let high = nums.length - 1;
 
-var sortColors = function(nums) {
-    let low=0;
-    let mid=0;
-    let high=nums.length-1;
-   
-    while(mid<=high){
-        if(nums[mid] === 0){
-            [nums[mid],nums[low]]=[nums[low],nums[mid]]
-            low++;
-            mid++;
-        }
-        else if(nums[mid] === 1)
-            mid++
-        else {
-            [nums[mid],nums[high]]=[nums[high],nums[mid]]
-            high--;
-        }
+  while (mid <= high) {
+    if (nums[mid] === 0) {
+      [nums[mid], nums[low]] = [nums[low], nums[mid]];
+      low++;
+      mid++;
+    } else if (nums[mid] === 1) mid++;
+    else {
+      [nums[mid], nums[high]] = [nums[high], nums[mid]];
+      high--;
     }
-       
-   };
+  }
+};
