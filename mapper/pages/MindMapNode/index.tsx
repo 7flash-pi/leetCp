@@ -1,13 +1,29 @@
-import useStore from "@/store/store";
+import useStore from '@/store/store';
+import React, { useRef, useEffect, useLayoutEffect } from 'react';
 import { Handle, NodeProps, Position } from 'reactflow';
- 
+
 export type NodeData = {
   label: string;
 };
- 
+
 function MindMapNode({ id, data }: NodeProps<NodeData>) {
+  const inputRef = useRef<HTMLInputElement>();
   const updateNodeLabel = useStore((state) => state.updateNodeLabel);
- 
+
+  useLayoutEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.width = `${data.label.length * 8}px`;
+    }
+  }, [data.label.length]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus({ preventScroll: true });
+      }
+    }, 1);
+  }, []);
+
   return (
     <>
       <div className="inputWrapper">
@@ -28,11 +44,11 @@ function MindMapNode({ id, data }: NodeProps<NodeData>) {
           className="input"
         />
       </div>
- 
+
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Top} />
     </>
   );
 }
- 
+
 export default MindMapNode;

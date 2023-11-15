@@ -74,5 +74,12 @@ const useStore = create<RFState>((set, get) => ({
     });
   },
 }));
+export enum ConnectionLineType {
+  Bezier = "default",
+  Straight = "straight",
+  Step = "step",
+  SmoothStep = "smoothstep",
+  SimpleBezier = "simplebezier"
+}
 
 export default useStore;

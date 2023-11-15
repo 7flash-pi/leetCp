@@ -1,3 +1,4 @@
+import React, { useCallback, useRef, useState } from "react";
 import ReactFlow, {
   Controls,
   OnConnectEnd,
@@ -10,21 +11,15 @@ import ReactFlow, {
   NodeOrigin,
   ConnectionLineType,
 } from "reactflow";
-
-import "reactflow/dist/style.css";
 import { shallow } from "zustand/shallow";
+
 import useStore, { RFState } from "../store/store";
 import MindMapNode from "./MindMapNode";
 import MindMapEdge from "./MindMapEdge";
-import { useCallback, useRef } from "react";
 
-const nodeTypes = {
-  mindmap: MindMapNode,
-};
-
-const edgeTypes = {
-  mindmap: MindMapEdge,
-};
+// we need to import the React Flow styles to make it work
+import "reactflow/dist/style.css";
+import Dropdown from "@/components/Dropdown";
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -34,17 +29,39 @@ const selector = (state: RFState) => ({
   addChildNode: state.addChildNode,
 });
 
+
+const nodeTypes = {
+  mindmap: MindMapNode,
+};
+
+const edgeTypes = {
+  mindmap: MindMapEdge,
+};
+
 const nodeOrigin: NodeOrigin = [0.5, 0.5];
+const connectionLineStyle = { stroke: "#F6AD55", strokeWidth: 3 };
+const defaultEdgeOptions = { style: connectionLineStyle, type: "mindmap" };
 
 function Flow() {
+  // whenever you use multiple values, you should use shallow for making sure that the component only re-renders when one of the values change
   const { nodes, edges, onNodesChange, onEdgesChange, addChildNode } = useStore(
     selector,
     shallow
   );
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+
+  const handleDropdownChange = (value: string | null) => {
+    setSelectedOption(value);
+  };
+
+  const connectingNodeId = useRef<string | null>(null);
   const store = useStoreApi();
   const { screenToFlowPosition } = useReactFlow();
 
-  const getChildNodePosition = (event: MouseEvent, parentNode?: Node) => {
+  const getChildNodePosition = (
+    event: MouseEvent | TouchEvent,
+    parentNode?: Node
+  ) => {
     const { domNode } = store.getState();
 
     if (
@@ -58,9 +75,15 @@ function Flow() {
       return;
     }
 
+    const { top, left } = domNode.getBoundingClientRect();
+
+    const isTouchEvent = "touches" in event;
+    const x = isTouchEvent ? event.touches[0].clientX : event.clientX;
+    const y = isTouchEvent ? event.touches[0].clientY : event.clientY;
+    // we need to remove the wrapper bounds, in order to get the correct mouse position
     const panePosition = screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
+      x,
+      y,
     });
 
     // we are calculating with positionAbsolute here because child nodes are positioned relative to their parent
@@ -70,8 +93,6 @@ function Flow() {
     };
   };
 
-  const connectingNodeId = useRef<string | null>(null);
-
   const onConnectStart: OnConnectStart = useCallback((_, { nodeId }) => {
     connectingNodeId.current = nodeId;
   }, []);
@@ -80,48 +101,53 @@ function Flow() {
     (event) => {
       const { nodeInternals } = store.getState();
       const targetIsPane = (event.target as Element).classList.contains(
-        'react-flow__pane',
+        "react-flow__pane"
       );
-      const node = (event.target as Element).closest('.react-flow__node');
-   
-      if (node) {
-        node.querySelector('input')?.focus({ preventScroll: true });
-      } else if (targetIsPane && connectingNodeId.current) {
+
+      if (targetIsPane && connectingNodeId.current) {
         const parentNode = nodeInternals.get(connectingNodeId.current);
-        const childNodePosition = getChildNodePosition(event as MouseEvent, parentNode);
-   
+        const childNodePosition = getChildNodePosition(event, parentNode);
+
         if (parentNode && childNodePosition) {
           addChildNode(parentNode, childNodePosition);
         }
       }
     },
-    [getChildNodePosition],
+    [getChildNodePosition]
   );
 
   return (
-    <div className="flex justify-center items-center w-[80vw] h-[80vh] bg-[#fafafa] mx-auto">
-      
+    <main className=" flex gap-2">
+      <div className=" w-[80vw] h-[80vh] flex justify-center items-center bg-[#fafdfa] border-2 ">
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          fitView
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onConnectStart={onConnectStart}
           onConnectEnd={onConnectEnd}
           nodeOrigin={nodeOrigin}
-          
+          connectionLineStyle={connectionLineStyle}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineType={ConnectionLineType.Straight}
+          fitView
         >
           <Controls showInteractive={false} />
-          <Panel position="top-center">Flow Board</Panel>
+          <Panel position="top-left" className="header">
+            React Flow Mind Map
+          </Panel>
         </ReactFlow>
-    </div>
+      </div>
+     <div className="flex justify-center  mx-auto p-4">
+     <Dropdown trigger={<span>Line Color</span>} options={['Option 1', 'Option 2', 'Option 3']} onChange={handleDropdownChange} />
+     </div>
+    </main>
   );
 }
 
-function FlowWithProvider(props:any) {
+function FlowWithProvider(props: any) {
   return (
     <ReactFlowProvider>
       <Flow {...props} />
@@ -130,4 +156,3 @@ function FlowWithProvider(props:any) {
 }
 
 export default FlowWithProvider;
-
