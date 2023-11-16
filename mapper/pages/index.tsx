@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactFlow, {
   Controls,
   OnConnectEnd,
@@ -13,13 +13,14 @@ import ReactFlow, {
 } from "reactflow";
 import { shallow } from "zustand/shallow";
 
-import useStore, { RFState } from "../store/store";
+import useStore, { RFState, lineType, lineTypes } from "../store/store";
 import MindMapNode from "./MindMapNode";
 import MindMapEdge from "./MindMapEdge";
 
 // we need to import the React Flow styles to make it work
 import "reactflow/dist/style.css";
 import Dropdown from "@/components/Dropdown";
+
 
 const selector = (state: RFState) => ({
   nodes: state.nodes,
@@ -48,11 +49,15 @@ function Flow() {
     selector,
     shallow
   );
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<ConnectionLineType>(ConnectionLineType.Bezier);
 
-  const handleDropdownChange = (value: string | null) => {
-    setSelectedOption(value);
+  const handleDropdownChange = (event:any) => {
+   setSelectedOption(event)
   };
+ 
+  useEffect(()=>{
+    console.log({selectedOption})
+  },[selectedOption])
 
   const connectingNodeId = useRef<string | null>(null);
   const store = useStoreApi();
@@ -118,7 +123,7 @@ function Flow() {
 
   return (
     <main className=" flex gap-2">
-      <div className=" w-[80vw] h-[80vh] flex justify-center items-center bg-[#fafdfa] border-2 ">
+      <div className=" w-[80vw] h-[100vh] flex justify-center items-center bg-[#fafdfa] border-2 ">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -131,7 +136,7 @@ function Flow() {
           nodeOrigin={nodeOrigin}
           connectionLineStyle={connectionLineStyle}
           defaultEdgeOptions={defaultEdgeOptions}
-          connectionLineType={ConnectionLineType.Straight}
+          connectionLineType={selectedOption}
           fitView
         >
           <Controls showInteractive={false} />
@@ -141,7 +146,7 @@ function Flow() {
         </ReactFlow>
       </div>
      <div className="flex justify-center  mx-auto p-4">
-     <Dropdown trigger={<span>Line Color</span>} options={['Option 1', 'Option 2', 'Option 3']} onChange={handleDropdownChange} />
+     <Dropdown trigger={<span>Line Type</span>} options={lineTypes} onChange={ (event) => {handleDropdownChange(event)}} />
      </div>
     </main>
   );

@@ -1,11 +1,12 @@
 
 
+import { lineType } from '@/store/store';
 import React, { ReactNode, useState } from 'react';
 
 interface DropdownProps {
   trigger: ReactNode;
   children?: ReactNode;
-  options?: string | string[];
+  options?: string | lineType[];
   onChange?: (value: string | null) => void; 
 }
 
@@ -45,11 +46,11 @@ const Dropdown: React.FC<DropdownProps> = ({ trigger, children, options,onChange
                   ? options.map((option, index) => (
                       <div
                         key={index}
-                        className={`block px-4 py-2 text-sm text-gray-700 ${selectedValue === option ? 'bg-gray-100' : ''}`}
-                        onClick={() => handleOptionSelect(option)}
+                        className={`block px-4 py-2 text-sm text-gray-700 ${selectedValue === option.type ? 'bg-gray-100' : ''}`}
+                        onClick={() => handleOptionSelect(option.type)}
                         role="menuitem"
                       >
-                        {option}
+                        {option.type}
                       </div>
                     ))
                   : (

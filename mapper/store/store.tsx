@@ -8,9 +8,9 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
   XYPosition,
-} from 'reactflow';
-import { create } from 'zustand';
-import { nanoid } from 'nanoid';
+} from "reactflow";
+import { create } from "zustand";
+import { nanoid } from "nanoid";
 
 export type RFState = {
   nodes: Node[];
@@ -24,9 +24,9 @@ export type RFState = {
 const useStore = create<RFState>((set, get) => ({
   nodes: [
     {
-      id: 'root',
-      type: 'mindmap',
-      data: { label: 'React Flow Mind Map' },
+      id: "root",
+      type: "mindmap",
+      data: { label: "React Flow Mind Map" },
       position: { x: 0, y: 0 },
     },
   ],
@@ -44,8 +44,8 @@ const useStore = create<RFState>((set, get) => ({
   addChildNode: (parentNode: Node, position: XYPosition) => {
     const newNode = {
       id: nanoid(),
-      type: 'mindmap',
-      data: { label: 'New Node' },
+      type: "mindmap",
+      data: { label: "New Node" },
       position,
       parentNode: parentNode.id,
     };
@@ -68,7 +68,7 @@ const useStore = create<RFState>((set, get) => ({
           // it's important to create a new object here, to inform React Flow about the changes
           node.data = { ...node.data, label };
         }
-   
+
         return node;
       }),
     });
@@ -79,7 +79,31 @@ export enum ConnectionLineType {
   Straight = "straight",
   Step = "step",
   SmoothStep = "smoothstep",
-  SimpleBezier = "simplebezier"
+  SimpleBezier = "simplebezier",
 }
+export const lineTypes:lineType[] = [
+  { value: "default", type: ConnectionLineType.Bezier },
+  {
+    value: "straight",
+    type: ConnectionLineType.Straight,
+  },
+  {
+    value: "step",
+    type: ConnectionLineType.Step,
+  },
+  {
+    value: "smoothstep",
+    type: ConnectionLineType.SmoothStep,
+  },
+  {
+    value: "simplebezier",
+    type: ConnectionLineType.SimpleBezier,
+  },
+];
 
+export interface lineType {
+  value:string,
+  type:ConnectionLineType
+    
+}
 export default useStore;
