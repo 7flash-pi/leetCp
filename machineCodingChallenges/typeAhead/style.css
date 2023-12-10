@@ -1,0 +1,37 @@
+#app{
+    width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin : 0 auto;
+    gap:8px;
+}
+
+input {
+    width: 100%;
+    font-size: 1em;
+    padding: 1.2em;
+    border-radius: 0.5em 1em; 
+}
+input:focus{
+    border:none;
+}
+.suggestion-container{
+    display: none;
+}
+.suggestion-visible {
+    display: block !important;
+  
+    padding: 0.5em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    flex-direction: column;
+    max-width: 300px;
+    overflow-y: scroll;
+    box-shadow: 0 0 0 0 2px #000;
+    border-radius: 0.5em 1em; 
+    width: 100%;
+}
