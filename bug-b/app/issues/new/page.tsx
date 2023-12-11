@@ -1,5 +1,5 @@
 "use client";
-import { Button, Input } from "antd";
+import { Button, Input,notification } from "antd";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { useForm, Controller } from "react-hook-form";
@@ -12,17 +12,33 @@ interface issueForm {
 }
 
 const NewIssuePage = () => {
+    const [api, contextHolder] = notification.useNotification();
   const router = useRouter();
-  const { register, control, handleSubmit } = useForm<issueForm>();
+  const {  control, handleSubmit } = useForm<issueForm>();
+
+
+  const openNotification = () =>{
+    api.error({
+        message:'An unexpected error occured.',
+        duration:2
+    })
+  }
 
   const onSubmit = async (data: issueForm) => {
-    if (data.title?.length >= 3 && data.description?.length >= 3) {
-      await axios.post("/api/issues", data);
-      router.push("/issues");
+    try {
+            await axios.post("/api/issues", data);
+            router.push("/issues");
+          
+        
+    } catch (error) {
+      openNotification()
+        
     }
   };
 
   return (
+    <>
+    {contextHolder}
     <form className="max-w-xl space-y-3" onClick={handleSubmit(onSubmit)}>
       <Controller
         name="title"
@@ -38,6 +54,7 @@ const NewIssuePage = () => {
       />
       <Button htmlType="submit">Submit new Issue</Button>
     </form>
+    </>
   );
 };
 
