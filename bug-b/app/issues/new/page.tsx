@@ -1,8 +1,8 @@
 'use client'
-import React from 'react'
 import { Button, Input } from 'antd'
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
-const {TextArea}=Input
 
 type Props = {}
 
@@ -10,7 +10,7 @@ const page = (props: Props) => {
   return (
     <div className='max-w-xl space-y-3'>
         <Input placeholder='Title' />
-        <TextArea placeholder='Description' rows={4} />
+        <SimpleMDE placeholder='Description'/>
         <Button>Submit new Issue</Button>
     </div>
   )
