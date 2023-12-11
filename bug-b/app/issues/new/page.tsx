@@ -1,60 +1,58 @@
 "use client";
-import { Button, Input,notification } from "antd";
+import { Button, Input, Alert } from "antd";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { bugSchema } from "@/app/validationSchemas";
+import { z } from "zod";
+import { useState } from "react";
 
-interface issueForm {
-  title: string;
-  description: string;
-}
+type issueForm = z.infer<typeof bugSchema>;
 
 const NewIssuePage = () => {
-    const [api, contextHolder] = notification.useNotification();
   const router = useRouter();
-  const {  control, handleSubmit } = useForm<issueForm>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<issueForm>({
+    resolver: zodResolver(bugSchema),
+  });
 
-
-  const openNotification = () =>{
-    api.error({
-        message:'An unexpected error occured.',
-        duration:2
-    })
-  }
+  const [error, setError] = useState('')
 
   const onSubmit = async (data: issueForm) => {
     try {
-            await axios.post("/api/issues", data);
-            router.push("/issues");
-          
-        
+      await axios.post("/api/issues", data);
+      router.push("/issues");
     } catch (error) {
-      openNotification()
-        
+        setError('An Unexpected Error Occured')
     }
   };
 
   return (
-    <>
-    {contextHolder}
-    <form className="max-w-xl space-y-3" onClick={handleSubmit(onSubmit)}>
-      <Controller
-        name="title"
-        control={control}
-        render={({ field }) => <Input placeholder="Title" {...field} />}
-      />
-      <Controller
-        name="description"
-        control={control}
-        render={({ field }) => (
-          <SimpleMDE placeholder="Description" {...field} />
-        )}
-      />
-      <Button htmlType="submit">Submit new Issue</Button>
-    </form>
-    </>
+    <div className="max-w-xl">
+      <form className=" space-y-3" onClick={handleSubmit(onSubmit)}>
+        {errors.title && <Alert message={errors.title.message} type="error" />}
+        <Controller
+          name="title"
+          control={control}
+          render={({ field }) => <Input placeholder="Title" {...field} />}
+        />
+          {errors.description && <Alert message={errors.description.message} type="error" />}
+        <Controller
+          name="description"
+          control={control}
+          render={({ field }) => (
+            <SimpleMDE placeholder="Description" {...field} />
+          )}
+        />
+        <Button htmlType="submit">Submit new Issue</Button>
+      </form>
+    </div>
   );
 };
 
