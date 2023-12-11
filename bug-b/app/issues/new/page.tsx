@@ -1,19 +1,44 @@
-'use client'
-import { Button, Input } from 'antd'
+"use client";
+import { Button, Input } from "antd";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
+import { useForm, Controller } from "react-hook-form";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-
-type Props = {}
-
-const page = (props: Props) => {
-  return (
-    <div className='max-w-xl space-y-3'>
-        <Input placeholder='Title' />
-        <SimpleMDE placeholder='Description'/>
-        <Button>Submit new Issue</Button>
-    </div>
-  )
+interface issueForm {
+  title: string;
+  description: string;
 }
 
-export default page
+const NewIssuePage = () => {
+  const router = useRouter();
+  const { register, control, handleSubmit } = useForm<issueForm>();
+
+  const onSubmit = async (data: issueForm) => {
+    if (data.title?.length >= 3 && data.description?.length >= 3) {
+      await axios.post("/api/issues", data);
+      router.push("/issues");
+    }
+  };
+
+  return (
+    <form className="max-w-xl space-y-3" onClick={handleSubmit(onSubmit)}>
+      <Controller
+        name="title"
+        control={control}
+        render={({ field }) => <Input placeholder="Title" {...field} />}
+      />
+      <Controller
+        name="description"
+        control={control}
+        render={({ field }) => (
+          <SimpleMDE placeholder="Description" {...field} />
+        )}
+      />
+      <Button htmlType="submit">Submit new Issue</Button>
+    </form>
+  );
+};
+
+export default NewIssuePage;
